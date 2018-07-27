@@ -1,0 +1,205 @@
+package kr.or.ddit.jspboard.sevice;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.jspboard.model.JspBoardVo;
+import kr.or.ddit.jspboard.model.JspCommentVo;
+import kr.or.ddit.jspboard.model.JspFileVo;
+import kr.or.ddit.jspboard.model.JspPostsVo;
+
+public interface JspBoardServiceInf {
+
+	
+	
+	
+	
+	/**
+	 * 
+	 * Method : selectJspBoardList
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return List<JspBoardVo>
+	 * Method 설명 : 전체 게시판 목록을 조회한다.
+	 */
+	List<JspBoardVo> selectJspBoardList(String std_id);
+	
+	/**
+	 * 
+	 * Method : selectLeftMenuJspBoardList
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return List<JspBoardVo>
+	 * Method 설명 : 왼쪽 메뉴 전체 게시판 목록를 조회한다.
+	 */
+	List<JspBoardVo> selectLeftMenuJspBoardList();
+	
+	/**
+	 * 
+	 * Method : selectJspBoard
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return JspBoardVo
+	 * Method 설명 : 게시판 정보를 조회한다.
+	 */
+	JspBoardVo selectJspBoard(Map<String, String> paramMap);
+	
+	/**
+	 * 
+	 * Method : insertJspBoard
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 게시판 정보 등록
+	 */
+	public void insertJspBoard(JspBoardVo jspBoardVo);
+	
+	/**
+	 * 
+	 * Method : updateJspBoard
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 게시판 정보 수정
+	 */
+	public void updateJspBoard(JspBoardVo jspBoardVo);
+	
+	/**
+	 * 
+	 * Method : selectJspPosts
+	 * 최초작성일 : 2018. 7. 23.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @param std_id
+	 * @return  JspPostsVo
+	 * Method 설명 : 게시판번호를 받아 게시글 하나를 조회
+	 */
+	public JspPostsVo selectJspPosts(int board_no);
+	
+	//=============================================================
+	
+	/**
+	 * 
+	 * Method : selectJspPosts
+	 * 최초작성일 : 2018. 7. 24.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @param std_id
+	 * @return  JspPostsVo
+	 * Method 설명 : 게시글 정보를 받아 게시글 하나의 정보를 조회
+	 */
+	public JspPostsVo selectJspPostsOne(Map<String, Integer> postsParamMap);
+	
+
+	
+	
+	
+	
+	/**
+	 * 
+	 * Method : selectJspPostsList
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return List<JspPostsVo>
+	 * Method 설명 : 전체 게시글 목록를 조회한다.
+	 */
+	List<JspPostsVo> selectJspPostsList(Map paramMap);
+	
+	
+	
+	/**
+	 * Method : getGroupBoardList
+	 * 최초작성일 : 2018. 7. 25.
+	 * 작성자 : PC07
+	 * 변경이력 :
+	 * @param paramMap
+	 * @return
+	 * Method 설명 : 전체 게시글을 조회 후 페이징 처리 하기 위한 메서드
+	 */
+	Map<String, Object> getGroupBoardList(Map paramMap);
+	
+	/**
+	 * 
+	 * Method : insertJspPosts
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 게시글 정보 등록
+	 */
+	int insertJspPosts(JspPostsVo jspPostsVo);
+	
+	/**
+	 * 
+	 * Method : updateJspPosts
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 게시글 정보 수정
+	 */
+	void updateJspPosts(JspPostsVo jspPostsVo);
+	
+	/**
+	 * 
+	 * Method : deleteJspPosts
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 게시글 삭제
+	 */
+	void deleteJspPosts(JspPostsVo jspPostsVo);
+	
+	/**
+	 * 
+	 * Method : insertJspComment
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 댓글 저장
+	 */
+	void insertJspComment(JspCommentVo jspCommentVo);
+	
+	/**
+	 * 
+	 * Method : updateJspComment
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 댓글 수정
+	 */
+	void updateJspComment(JspCommentVo jspCommentVo);
+	
+	/**
+	 * 
+	 * Method : deleteJspComment
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 댓글 수정
+	 */
+	public void deleteJspComment(JspCommentVo jspCommentVo);
+	
+	
+	/**
+	 * 
+	 * Method : deleteJspFile
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 첨부파일 정보 삭제
+	 */
+	void deleteJspFile(JspFileVo jspFileVo);
+	
+}

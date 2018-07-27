@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="student">
+	
+	<!--학생(회원을 조회해서 로그인)  -->
+
+
+	
+	<!-- 전체학생 정보조회 -->
+	<select id="selectAllStudents" resultType="kr.or.ddit.jspboard.model.JspStudentVo">   <!-- alias="studentVo"  -->
+		select * from jspstudent
+	</select>
+
+	
+	<!--학생 정보조회 -->
+	<select id="getStudentById" resultType="studentVo" parameterType="String">
+		select * from jspstudent where std_id = #{std_id}
+	</select>
+
+
+	<!--학생 정보조회 -->
+	<select id="getStudentByVo" resultType="studentVo"
+		parameterType="studentVo">
+		select * from jspstudent where STD_ID = #{std_id}
+		<!-- select * from student where id = #{id} and name=#{name} and call_cnt=#{call_cnt} -->
+	</select>
+  
+  
+    <!--학생 정보 페이징 조회   -->
+    <select id="getStudentPageList"   resultType="studentVo"  parameterType="map">
+		SELECT *
+		FROM
+			(SELECT a.*, ROWNUM AS rn
+				FROM
+					(SELECT *
+						FROM jspstudent
+					ORDER BY NAME) a )
+		WHERE rn BETWEEN ( #{page} -1 ) * #{pageSize} +1 AND  #{page} * #{pageSize}
+	</select>
+	
+	
+	
+	<!--07.11  -->
+	<!-- 학생 전체 건수 조회   -->
+	<select id="getStudentTotalCnt" resultType="int">
+		select count(*) from jspstudent
+	</select>
+
+
+	<!--07.17 -->
+<!-- 	update student set pic='sally.png',
+		picpath='D:\W\A_TeachingMaterial\7.JspSrpgin\fileUpload',
+		picname='b4a18122-e170-462a-a971-6fdb60d38f57',
+		addr1='대전광역시 중구 중앙로 76',
+		addr2='영민빌딩 2층 대덕인재개발원',
+		zipcd='34940',
+		name='강병관'
+		WHERE id = 2; -->
+		
+	<update id="studentUpdate" parameterType="studentVo">
+		UPDATE jspstudent SET
+					 PIC 		= #{pic}
+					,PICPATH 	= #{picpath}
+					,PICNAME 	= #{picname}
+					,ADDR1 		= #{addr1}
+					,ADDR2 		= #{addr2}
+					,ZIPCD 		= #{zipcd}
+					,NAME 		= #{name}
+		WHERE STD_ID 	= #{std_id}
+	</update>
+	
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+</mapper>

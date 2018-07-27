@@ -1,0 +1,1 @@
+table tbody tr:hover{cursor:pointer;} /* For all tables 마우스 오버되었을때 커서가 손가락 모양*/ 

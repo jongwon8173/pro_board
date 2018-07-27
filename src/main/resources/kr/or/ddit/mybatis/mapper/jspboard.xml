@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  
+<mapper namespace="jspboard">
+	
+	<!-- 게시판, 게시글 조회해서 처리  -->
+	
+	<!-- 게시판 목록조회 -->
+	<select id="selectJspBoardList" resultType="boardVo" parameterType="String">
+		SELECT board_no 
+			 , std_id
+			 , board_nm
+			 , board_yn
+			 , to_char(board_dt, 'yyyy-mm-dd') AS board_dt
+		FROM JSPBOARD
+		WHERE STD_ID = #{std_id}
+	</select>
+	
+	<!-- 메뉴 게시판 목록조회 -->
+	<select id="selectLeftMenuJspBoardList" resultType="boardVo" parameterType="String">
+		SELECT board_no 
+			 , std_id
+			 , board_nm
+			 , board_yn
+			 , to_char(board_dt, 'yyyy-mm-dd') AS board_dt
+		FROM JSPBOARD
+		WHERE BOARD_YN = 'Y'
+	</select>	
+	
+	<!-- 게시판 정보조회 -->
+	<select id="selectJspBoard" resultType="boardVo" parameterType="Map">
+		SELECT board_no 
+			 , std_id
+			 , board_nm
+			 , board_yn
+			 , to_char(board_dt, 'yyyy-mm-dd') AS board_dt
+		FROM JSPBOARD
+		WHERE BOARD_NO = #{board_no}
+	</select>
+	
+	
+	<!-- 게시판 등록 -->
+	<insert id="insertJspBoard" parameterType="boardVo">
+		INSERT INTO JSPBOARD
+		(
+			  BOARD_NO
+			, STD_ID
+			, BOARD_NM
+			, BOARD_YN
+			, BOARD_DT
+		)
+		VALUES
+		(
+			  (SELECT NVL(MAX(BOARD_NO), 0) + 1 FROM JSPBOARD)
+		 	, #{std_id}
+		 	, #{board_nm}
+		 	, #{board_yn}
+		 	, SYSDATE
+		)
+	</insert>
+	
+	<!-- 게시판 수정 -->
+	<update id="updateJspBoard" parameterType="boardVo">
+		UPDATE JSPBOARD
+		   SET BOARD_NM = #{board_nm}
+		     , BOARD_YN = #{board_yn}
+		     , BOARD_DT = SYSDATE
+		 WHERE BOARD_NO = #{board_no}
+	</update>
+	
+<!-- =============================================================================================================================  -->
+
+	<!-- 07.24 추가   -->
+	<!-- 게시판번호, 게시글 번호를(postsVo) 받아 게시글 하나를 조회 JspPostsVo 하나 반환 -->
+	<select id="selectJspPostsOne" resultType="postsVo" parameterType="Map">
+		SELECT POSTS_NO
+			 , POSTS_PNO
+			 , BOARD_NO
+			 , POSTS_TIT
+			 , POSTS_CON
+			 , POSTS_WRI
+			 , TO_CHAR(POSTS_INDT, 'yyyy-mm-dd') AS POSTS_INDT
+			 , POSTS_YN
+			 , TO_CHAR(POSTS_UPDT, 'yyyy-mm-dd') AS POSTS_UPDT
+			 , POSTS_COUNT
+			 , POSTS_GRPNO 
+		  FROM JSPPOSTS
+		 WHERE BOARD_NO = #{board_no}
+		   AND POSTS_NO = #{posts_no}
+	</select>
+	
+	
+	
+	<!-- 게시판번호를 받아 게시글 하나를 조회 JspPostsVo 하나 반환 -->
+ 	<select id="selectJspPosts" resultType="postsVo" parameterType="int">
+		SELECT POSTS_NO
+			 , POSTS_PNO
+			 , BOARD_NO
+			 , POSTS_TIT
+			 , POSTS_CON
+			 , POSTS_WRI
+			 , TO_CHAR(POSTS_INDT, 'yyyy-mm-dd') AS POSTS_INDT
+			 , POSTS_YN
+			 , TO_CHAR(POSTS_UPDT, 'yyyy-mm-dd') AS POSTS_UPDT
+			 , POSTS_COUNT
+			 , POSTS_GRPNO 
+		  FROM JSPPOSTS
+		 WHERE BOARD_NO = #{board_no}
+		   AND POSTS_NO = #{posts_no}
+	</select> 
+	
+	
+	 
+<!--     학생 정보 페이징 조회  
+    <select id="getStudentPageList"   resultType="studentVo"  parameterType="map">
+		SELECT *
+		FROM
+			(SELECT a.*, ROWNUM AS rn
+				FROM
+					(SELECT *
+						FROM jspstudent
+					ORDER BY NAME) a )
+		WHERE rn BETWEEN ( #{page} -1 ) * #{pageSize} +1 AND  #{page} * #{pageSize}
+	</select> -->
+	
+<!-- 	<select id="selectJspPostsList"  resultType="postsVo" parameterType="Map">
+		SELECT *
+		  FROM (SELECT T.*, ROWNUM AS rnum
+		             
+		          FROM (SELECT LEVEL AS LVL
+						     , POSTS_NO
+							 , POSTS_PNO
+							 , BOARD_NO
+							 , POSTS_TIT
+							 , POSTS_CON
+							 , POSTS_WRI
+							 , TO_CHAR(POSTS_INDT, 'yyyy-mm-dd') AS POSTS_INDT
+							 , POSTS_YN
+							 , TO_CHAR(POSTS_UPDT, 'yyyy-mm-dd') AS POSTS_UPDT
+							 , POSTS_COUNT
+							 , POSTS_GRPNO
+						  FROM JSPPOSTS
+						 WHERE BOARD_NO = #{board_no}
+						 START WITH POSTS_PNO = 0
+						 CONNECT BY PRIOR POSTS_PNO = POSTS_NO
+						 ORDER SIBLINGS BY POSTS_NO DESC, POSTS_UPDT DESC) T)
+			WHERE rnum BETWEEN ( #{page} -1 ) * #{pageSize} +1 AND  #{page} * #{pageSize}
+	</select> -->
+
+	<!--조건에 해당하는 게시글 정보조회 , 페이징 처리  -->
+	<!-- 2018.07.25  답글 표시 : 본인이 본인글 일때 -1 부터 루프 시작-->
+ 	<select id="selectJspPostsList"  resultType="postsVo" parameterType="Map">
+		 SELECT *
+		  FROM (SELECT ROWNUM AS rnum
+		             , T.*
+		          FROM (SELECT LEVEL AS LVL
+						     , POSTS_NO
+							 , POSTS_PNO
+							 , BOARD_NO
+							 , POSTS_TIT
+							 , POSTS_CON
+							 , POSTS_WRI
+							 , TO_CHAR(POSTS_INDT, 'yyyy-mm-dd') AS POSTS_INDT
+							 , POSTS_YN
+							 , TO_CHAR(POSTS_UPDT, 'yyyy-mm-dd') AS POSTS_UPDT
+							 , POSTS_COUNT
+							 , POSTS_GRPNO
+						  FROM JSPPOSTS
+						 WHERE BOARD_NO = #{board_no}
+						   AND POSTS_YN = 'Y'
+						 START WITH POSTS_PNO = -1
+						 CONNECT BY PRIOR POSTS_PNO = POSTS_NO
+						 ORDER SIBLINGS BY POSTS_NO DESC, POSTS_UPDT DESC) T)
+			WHERE rnum BETWEEN ( #{page} -1 ) * #{pageSize} +1 AND  #{page} * #{pageSize}
+	</select> 
+	
+	<!-- 한 게시판의 게시물 총개수 -->
+	<select id="selectJspPostsTotCnt" parameterType="Map" resultType="int">
+		SELECT count(*)
+		  FROM JSPPOSTS
+		 WHERE BOARD_NO = #{board_no}
+		   AND POSTS_YN = 'Y'
+	</select>
+
+	<!-- 게시글 번호 생성  -->
+	<select id="getJspPostsNoByPk" parameterType="postsVo" resultType="int">
+		SELECT NVL(MAX(POSTS_NO), 0) + 1 FROM JSPPOSTS 
+	</select>
+	
+	<!-- 게시물 등록 -->
+	<insert id="insertJspPosts" parameterType="postsVo">
+		INSERT INTO JSPPOSTS
+		(
+			  POSTS_NO
+			, POSTS_PNO
+			, BOARD_NO
+			, POSTS_TIT
+			, POSTS_CON
+			, POSTS_WRI
+			, POSTS_INDT
+			, POSTS_YN
+			, POSTS_UPDT
+			, POSTS_COUNT
+			, POSTS_GRPNO		
+		)
+		VALUES
+		(
+			  (SELECT NVL(MAX(POSTS_NO), 0) + 1 FROM JSPPOSTS)
+			, #{posts_pno}
+			, #{board_no}
+			, #{posts_tit}
+			, #{posts_con}
+			, #{posts_wri}
+			, SYSDATE
+			, 'Y'
+			, SYSDATE
+			, 0
+			, #{posts_grpno}
+		)
+	</insert>
+	
+	<!-- 게시물 수정 -->
+	<update id="updateJspPosts" parameterType="postsVo">
+		UPDATE JSPPOSTS 
+		   SET POSTS_TIT = #{posts_tit}
+			 , POSTS_CON = #{posts_con}
+			 , POSTS_WRI = #{posts_wri}
+			 , POSTS_UPDT = SYSDATE
+		 WHERE POSTS_NO = #{posts_no}
+		   AND BOARD_NO = #{board_no}
+	</update>
+	
+	<!-- 게시글 삭제 -->
+	<update id="deleteJspPosts" parameterType="postsVo">UPDATE JSPPOSTS 
+		   SET POSTS_YN = 'N'
+			 , POSTS_UPDT = SYSDATE
+		 WHERE POSTS_NO = #{posts_no}
+		   AND BOARD_NO = #{board_no}
+	</update>
+	
+	<!-- 게시물 조회수 -->
+	<update id="updateJspPostsQryCnt" parameterType="postsVo">
+		UPDATE JSPPOSTS 
+		   SET POSTS_COUNT = POSTS_COUNT + 1
+		 WHERE POSTS_NO = #{posts_no}
+		   AND BOARD_NO = #{board_no}
+	</update>
+	
+	<!-- 게시글 댓글 목록 -->
+	<select id="selectJspCommentList" parameterType="int" resultType="commentVo">
+		SELECT COM_NO
+<!-- 			 , COM_PNO -->
+			 , POSTS_NO
+			 , COM_CON
+			 , TO_CHAR(COM_DT, 'yyyy-MM-dd HH24:MI:SS') AS COM_DT
+			 , COM_WRI
+			 , COM_YN
+		  FROM JSPCOMMENT
+		 WHERE POSTS_NO = #{posts_no}
+		 ORDER BY COM_DT DESC
+	</select>
+	 
+	<!-- 댓글 등록 -->
+	<insert id="insertJspComment" parameterType="commentVo">
+		INSERT INTO JSPCOMMENT
+		(
+			  COM_NO
+<!-- 			, COM_PNO -->
+			, POSTS_NO
+			, COM_CON
+			, COM_DT
+			, COM_WRI
+			, COM_YN
+		)
+		VALUES
+		(
+			  (SELECT NVL(MAX(COM_NO), 0) + 1 FROM JSPCOMMENT)
+<!-- 			, #{com_pno} -->
+			, #{posts_no}
+			, #{com_con}
+			, SYSDATE
+			, #{com_wri}
+			, 'Y'
+		)
+	</insert>
+	
+	<!-- 게시물 수정 -->
+	<update id="updateJspComment" parameterType="commentVo">
+		UPDATE JSPCOMMENT 
+		   SET COM_CON = #{com_con}
+			 , COM_WRI = #{com_wri}
+			 , COM_DT = SYSDATE
+		 WHERE POSTS_NO = #{posts_no}
+		   AND COM_NO = #{com_no}
+	</update>
+	
+	<!-- 게시물 삭제 -->
+	<update id="deleteJspComment" parameterType="postsVo">
+		UPDATE JSPCOMMENT 
+		   SET COM_YN = 'N'
+			 , COM_WRI = #{com_wri}
+			 , COM_DT = SYSDATE
+		 WHERE POSTS_NO = #{posts_no}
+		   AND COM_NO = #{com_no}
+	</update>
+	
+	<!-- 파일정보 저장 -->
+	<insert id="insertJspFile" parameterType="fileVo">
+		INSERT INTO JSPFILE
+		(
+			  FILE_NO
+			, POSTS_NO
+			, FILE_UPNM
+			, FILE_PATH
+			, FILE_RENM
+			, FILE_SIZE
+		)
+		VALUES
+		(
+			  (SELECT NVL(MAX(FILE_NO), 0) + 1 FROM JSPFILE)
+			, #{posts_no}
+			, #{file_upnm}
+			, #{file_path}
+			, #{file_renm}
+			, #{file_size}
+		)
+	</insert>
+	
+	<!-- 게시글 첨부파일 목록 조회 -->
+	<select id="selectFileList" parameterType="int" resultType="fileVo">
+		SELECT *
+		  FROM JSPFILE
+		 WHERE POSTS_NO = #{posts_no}
+	</select>
+	
+	<!-- 게시글 첨부파일 삭제 -->
+	<delete id="deleteJspFile" parameterType="fileVo">
+		DELETE FROM JSPFILE
+		 WHERE POSTS_NO = #{posts_no}
+		   AND FILE_NO = #{file_no}
+	</delete>
+
+</mapper>

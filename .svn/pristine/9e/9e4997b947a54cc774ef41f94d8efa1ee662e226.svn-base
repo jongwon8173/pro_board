@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+  <typeAliases>
+  	<typeAlias type="kr.or.ddit.jspboard.model.JspBoardVo" alias="boardVo"/>
+  	<typeAlias type="kr.or.ddit.jspboard.model.JspCommentVo" alias="commentVo"/>
+  	<typeAlias type="kr.or.ddit.jspboard.model.JspFileVo" alias="fileVo"/>
+  	<typeAlias type="kr.or.ddit.jspboard.model.JspPostsVo" alias="postsVo"/>
+  	<typeAlias type="kr.or.ddit.jspboard.model.JspStudentVo" alias="studentVo"/>
+  	 	
+   </typeAliases> 
+  
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="oracle.jdbc.driver.OracleDriver"/>
+		<!-- <property name="url" value="jdbc:oracle:thin:@localhost:1521:orcl"/> -->
+		<property name="url" value="jdbc:oracle:thin:@localhost:1521:xe"/>
+        <property name="username" value="pc24"/>
+		<!-- <property name="password" value="pc24"/> -->
+		<property name="password" value="java"/>
+      </dataSource>
+    </environment>
+  </environments>
+  
+  
+  
+  <mappers>
+    <mapper resource="kr/or/ddit/mybatis/mapper/student.xml"/>
+    
+    <mapper resource="kr/or/ddit/mybatis/mapper/jspboard.xml"/>
+  </mappers>
+
+  
+
+  
+</configuration>

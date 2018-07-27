@@ -1,0 +1,258 @@
+package kr.or.ddit.jspboard.sevice;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.jspboard.dao.JspBoardDao;
+import kr.or.ddit.jspboard.dao.JspBoardDaoInf;
+import kr.or.ddit.jspboard.model.JspBoardVo;
+import kr.or.ddit.jspboard.model.JspCommentVo;
+import kr.or.ddit.jspboard.model.JspFileVo;
+import kr.or.ddit.jspboard.model.JspPostsVo;
+
+public class JspBoardService implements JspBoardServiceInf {
+
+	JspBoardDaoInf jspBoardDao = new JspBoardDao();
+	
+	/*=================================================*/
+	/*== 게시판
+	/*=================================================*/
+	
+	/**
+	 * 
+	 * Method : selectJspBoardList
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return List<JspBoardVo>
+	 * Method 설명 : 전체 게시판 목록을 조회한다.
+	 */
+	public List<JspBoardVo> selectJspBoardList(String std_id) {
+		return jspBoardDao.selectJspBoardList(std_id);
+	}
+	
+	/**
+	 * 
+	 * Method : selectLeftMenuJspBoardList
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return List<JspBoardVo>
+	 * Method 설명 : 왼쪽 메뉴 전체 게시판 목록를 조회한다.
+	 */
+	public List<JspBoardVo> selectLeftMenuJspBoardList() {
+		return jspBoardDao.selectLeftMenuJspBoardList();
+		
+	}
+	
+	/**
+	 * 
+	 * Method : selectJspBoard
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return JspBoardVo
+	 * Method 설명 : 게시판 정보를 조회한다.
+	 */
+	public JspBoardVo selectJspBoard(Map<String, String> paramMap) {
+		return jspBoardDao.selectJspBoard(paramMap);
+		
+	}
+	
+	/**
+	 * 
+	 * Method : insertJspBoard
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 게시판 정보 등록
+	 */
+	public void insertJspBoard(JspBoardVo jspBoardVo) {
+		jspBoardDao.insertJspBoard(jspBoardVo);
+	}
+	
+	/**
+	 * 
+	 * Method : updateJspBoard
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 게시판 정보 수정
+	 */
+	public void updateJspBoard(JspBoardVo jspBoardVo) {
+		jspBoardDao.updateJspBoard(jspBoardVo);
+	}
+	
+	/*=================================================*/
+	/*== 게시글
+	/*=================================================*/
+	
+	/**
+	 * 
+	 * Method : selectJspPosts
+	 * 최초작성일 : 2018. 7. 24.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @param std_id
+	 * @return  JspPostsVo
+	 * Method 설명 : 게시글 정보를 받아 게시글 하나의 정보를 조회
+	 */
+	@Override
+	public JspPostsVo selectJspPostsOne(Map<String, Integer> postsParamMap) {
+		JspPostsVo jspPostsVo = jspBoardDao.selectJspPostsOne(postsParamMap); 
+		
+		if(jspPostsVo != null) {
+			jspPostsVo.setFileList(jspBoardDao.selectFileList(postsParamMap.get("posts_no")));	// 첨부파일 목록 조회
+			jspPostsVo.setCommentList(jspBoardDao.selectJspCommentList(postsParamMap.get("posts_no")));	// 댓글목록 조회
+		}
+		return jspPostsVo;
+	}
+	
+	/**
+	 * 
+	 * Method : selectJspPosts
+	 * 최초작성일 : 2018. 7. 23.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @param std_id
+	 * @return  JspPostsVo
+	 * Method 설명 : 게시판번호를 받아 게시글 하나를 조회
+	 */
+	@Override
+	public JspPostsVo selectJspPosts(int board_no) {
+		return jspBoardDao.selectJspPosts(board_no);
+	}
+	
+	
+	/**
+	 * 
+	 * Method : selectJspPostsList
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return List<JspPostsVo>
+	 * Method 설명 : 전체 게시글 목록를 조회한다.
+	 */
+	public List<JspPostsVo> selectJspPostsList(Map paramMap) {
+		return jspBoardDao.selectJspPostsList(paramMap);
+	}
+	
+	/**
+	 * 
+	 * Method : insertJspPosts
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 게시글 정보 등록
+	 */
+	public int insertJspPosts(JspPostsVo jspPostsVo) {
+		int posts_no = jspBoardDao.getJspPostsNoByPk(jspPostsVo);
+		jspPostsVo.setPosts_no(posts_no);
+		
+		// 게시글 저장
+		jspBoardDao.insertJspPosts(jspPostsVo);
+		
+		// 첨부파일 정보 저장
+		List<JspFileVo> fileList = jspPostsVo.getFileList();
+		if(fileList != null && fileList.size() > 0) {
+			for(JspFileVo fileVo : fileList) {
+				fileVo.setPosts_no(posts_no);
+				jspBoardDao.insertJspFile(fileVo);
+			}
+		}
+		
+		return posts_no;
+	}
+	
+	/**
+	 * 
+	 * Method : updateJspPosts
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 게시글 정보 수정
+	 */
+	public void updateJspPosts(JspPostsVo jspPostsVo) {
+		jspBoardDao.updateJspPosts(jspPostsVo);
+		
+		// 첨부파일 정보 저장
+		List<JspFileVo> fileList = jspPostsVo.getFileList();
+		if(fileList != null && fileList.size() > 0) {
+			for(JspFileVo fileVo : fileList) {
+				fileVo.setPosts_no(jspPostsVo.getPosts_no());
+				jspBoardDao.insertJspFile(fileVo);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * Method : deleteJspPosts
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 게시글 삭제
+	 */
+	public void deleteJspPosts(JspPostsVo jspPostsVo) {
+		jspBoardDao.deleteJspPosts(jspPostsVo);
+	}
+	
+	/**
+	 * 
+	 * Method : insertJspComment
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 댓글 저장
+	 */
+	public void insertJspComment(JspCommentVo jspCommentVo) {
+		jspBoardDao.insertJspComment(jspCommentVo);
+	}
+	
+	/**
+	 * 
+	 * Method : updateJspComment
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 댓글 수정
+	 */
+	public void updateJspComment(JspCommentVo jspCommentVo) {
+		jspBoardDao.updateJspComment(jspCommentVo);
+	}
+	
+	/**
+	 * 
+	 * Method : deleteJspComment
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 댓글 수정
+	 */
+	public void deleteJspComment(JspCommentVo jspCommentVo) {
+		jspBoardDao.deleteJspComment(jspCommentVo);
+	}
+	
+	
+	/**
+	 * 
+	 * Method : deleteJspFile
+	 * 최초작성일 : 2018. 7. 20.
+	 * 작성자 : pc24
+	 * 변경이력 :
+	 * @return void
+	 * Method 설명 : 첨부파일 정보 삭제
+	 */
+	public void deleteJspFile(JspFileVo jspFileVo) {
+		jspBoardDao.deleteJspFile(jspFileVo);
+	}
+
+}
